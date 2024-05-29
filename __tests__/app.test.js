@@ -14,8 +14,6 @@ afterAll(() => {
   return db.end();
 });
 
-
-
 describe("/api/topics", () => {
   test("GET: 200 and get all topics from the endpoint", () => {
     return request(app).get("/api/topics").expect(200);
@@ -68,22 +66,59 @@ describe("/api/articles/:article_id", () => {
         );
       });
   });
-})
+});
 describe("Errors on /api/articles/:article_id", () => {
-  test("GET: 404 article should respond with Not found", () => {
-    return request(app)
-    .get("/api/random")
-    .expect(404)
-    .then((res) => {
-      expect(res.body).toEqual({ msg: "Not Found" })
-    })
-
-  });
   test("GET: 404 and responds with an appropriate status and error message when given a valid but non existent query ", () => {
     return request(app)
       .get("/api/articles/1000")
       .then((res) => {
         expect(res.status).toBe(404);
+        expect(res.body).toEqual({ msg: "Not Found" });
+      });
+  });
+});
+describe("/api/articles", () => {
+  test("GET: 200 and responds with an article object with the following properties: author, title, article_id, topic, created_at, votes, article_iage_url", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articleData } = body;
+        expect(Array.isArray(articleData)).toBe(true);
+        expect(articleData.length).toBe(13);
+        articleData.forEach((article) => {
+          expect(article).toEqual(
+            expect.objectContaining({
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              topic: expect.any(String),
+              author: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            })
+          );
+        });
+      });
+  });
+  test("GET: 200 and checks that articles have been sorted by date in descending order", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articleData } = body;
+        const sortedArticleData = [...articleData].sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        expect(articleData).toEqual(sortedArticleData);
+      });
+  });
+  test("GET: 404 article should respond with Not found", () => {
+    return request(app)
+      .get("/api/arcticals")
+      .expect(404)
+      .then((res) => {
         expect(res.body).toEqual({ msg: "Not Found" });
       });
   });
