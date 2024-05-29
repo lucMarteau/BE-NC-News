@@ -123,3 +123,45 @@ describe("/api/articles", () => {
       });
   });
 });
+describe('/api/articles/:article_id/comments', () => {
+  test('GET: 200 and responds with an empty array when article has no comments', () => {
+    return request(app)
+      .get("/api/articles/999/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { Comments } = body;
+        expect(Comments).toEqual([]);
+      });
+  });
+  test('GET: 200 and responds with an array of comment objects with expected properties', () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { Comments } = body;
+        Comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number)
+          });
+        });
+      });
+  });
+  test('GET: 200 and checks that comments have been sorted by date in descending order', () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { Comments } = body;
+        const sortedComments = [...Comments].sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        );
+        expect(Comments).toEqual(sortedComments);
+      });
+  });
+  
+});

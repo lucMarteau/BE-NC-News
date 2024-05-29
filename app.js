@@ -4,7 +4,8 @@ const {
   getTopics,
   getApi,
   getArticleId,
-  getArticles
+  getArticles,
+  getArticleIdComments
 } = require("./controllers/topic.controller");
 
 // app.use(express.json());
@@ -13,6 +14,7 @@ app.get("/api/topics", getTopics);
 app.get("/api/", getApi);
 app.get("/api/articles/:article_id", getArticleId);
 app.get("/api/articles", getArticles)
+app.get("/api/articles/:article_id/comments", getArticleIdComments)
 
 app.use((err, req, res, next) => {
   if (err.status) {
