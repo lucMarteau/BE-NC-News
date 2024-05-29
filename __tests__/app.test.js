@@ -69,7 +69,7 @@ describe("/api/articles/:article_id", () => {
       });
   });
 })
-describe("Errors", () => {
+describe("Errors on /api/articles/:article_id", () => {
   test("GET: 404 article should respond with Not found", () => {
     return request(app)
     .get("/api/random")
