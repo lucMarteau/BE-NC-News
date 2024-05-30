@@ -213,3 +213,20 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
+
+describe('PATCH /api/articles/:article_id', () => {
+  test('PATCH: 200 should update the article votes when given a number which will return an updated article', () => {
+    return request(app)
+    .patch("/api/articles/1")
+    .send ({ inc_votes:1 })
+    .expect(200)
+    .then(({ body }) => {
+      const { updatedArticle } = body;
+      console.log(updatedArticle)
+      expect(updatedArticle).toMatchObject({
+        article_id: 1,
+        votes: expect.any(Number)
+    })
+  })
+})
+})

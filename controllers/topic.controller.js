@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment } = require("../models/topic.model");
+const { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes } = require("../models/topic.model");
 const apiEndpoints = require("../endpoints.json");
 
 const getTopics = (req, res, next) => {
@@ -55,5 +55,14 @@ const postArticleComment = (req, res, next) => {
       }
     });
 };
+const patchUpdateVotes = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
 
-module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments, postArticleComment };
+  updateArticleVotes(article_id, inc_votes)
+  .then((updatedArticle) => {
+    res.status(200).send({ updatedArticle });
+  })
+  .catch(next)
+}
+module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments, postArticleComment, patchUpdateVotes };
