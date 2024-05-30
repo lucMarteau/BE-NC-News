@@ -73,7 +73,7 @@ describe("Errors on /api/articles/:article_id", () => {
       .get("/api/articles/1000")
       .then((res) => {
         expect(res.status).toBe(404);
-        expect(res.body).toEqual({ msg: "Not Found" });
+        expect(res.body.msg).toBe("Not Found");
       });
   });
 });
@@ -119,7 +119,7 @@ describe("/api/articles", () => {
       .get("/api/arcticals")
       .expect(404)
       .then((res) => {
-        expect(res.body).toEqual({ msg: "Not Found" });
+        expect(res.body.msg).toBe("Not Found");
       });
   });
 });
@@ -164,6 +164,9 @@ describe('/api/articles/:article_id/comments', () => {
       });
   });
 });
+// Will need to add a 404 to test where user is present but does not exist
+// Will need to add a 400 POST /api/articles/not-a-number/comments
+
 describe("POST /api/articles/:article_id/comments", () => {
   test("POST: 201 should add a comment to the specified article", () => {
     const newComment = {
@@ -195,7 +198,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(400)
       .then(({ body }) => {
-        expect(body).toHaveProperty('msg', 'Username and body required.');
+        expect(body.msg).toBe('Username and body required.');
       });
   });
   test('POST: 404 if the article does not exist', () => {
@@ -209,7 +212,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(404)
       .then(({ body }) => {
-        expect(body).toHaveProperty('msg', 'Not Found');
+        expect(body.msg).toBe('Not Found');
       });
   });
 });
@@ -222,11 +225,41 @@ describe('PATCH /api/articles/:article_id', () => {
     .expect(200)
     .then(({ body }) => {
       const { updatedArticle } = body;
-      console.log(updatedArticle)
       expect(updatedArticle).toMatchObject({
         article_id: 1,
-        votes: expect.any(Number)
+        votes: 101
     })
   })
 })
+test('PATCH: 200 should update the article votes when given a number which will return an updated article', () => {
+  return request(app)
+  .patch("/api/articles/1")
+  .send ({ inc_votes:-100 })
+  .expect(200)
+  .then(({ body }) => {
+    const { updatedArticle } = body;
+    expect(updatedArticle).toMatchObject({
+      article_id: 1,
+      votes: 0
+  })
+})
+})
+test('PATCH: 400 if inc_votes is not a number', () => {
+  return request(app)
+  .patch("/api/articles/1")
+  .send ({ inc_votes: 'string' })
+  .expect(400)
+  .then(({ body }) => {
+    expect(body.msg).toBe('Invalid input type');
+})
+})
+test('POST: 404 if the article does not exist', () => {
+  return request(app)
+    .patch('/api/articles/9999')
+    .send({ inc_votes: 1 })
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Not Found');
+    });
+});
 })

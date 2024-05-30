@@ -59,10 +59,19 @@ const patchUpdateVotes = (req, res, next) => {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
 
+  if (typeof inc_votes !== 'number') {
+    return res.status(400).send({ msg: 'Invalid input type' });
+  }
   updateArticleVotes(article_id, inc_votes)
   .then((updatedArticle) => {
     res.status(200).send({ updatedArticle });
   })
-  .catch(next)
+  .catch((err) => {
+    if (err.message === "Not Found") {
+      res.status(404).send({ msg: "Not Found" });
+    } else {
+      next(err);
+    }
+  });
 }
 module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments, postArticleComment, patchUpdateVotes };
