@@ -263,3 +263,14 @@ test('POST: 404 if the article does not exist', () => {
     });
 });
 })
+describe('DELETE /api/comments/:comment_id', () => {
+  test('DELETE: 204 should delete the given comment by comment_id', () => {
+    return request(app)
+    .delete("/api/comments/1")
+    .expect(204)
+    .then(({ body }) => {
+      expect(body).toEqual({})
+    });
+  });
+  
+});
