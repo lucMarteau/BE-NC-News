@@ -129,8 +129,8 @@ describe('/api/articles/:article_id/comments', () => {
       .get("/api/articles/999/comments")
       .expect(200)
       .then(({ body }) => {
-        const { Comments } = body;
-        expect(Comments).toEqual([]);
+        const { commentData } = body;
+        expect(commentData).toEqual([]);
       });
   });
   test('GET: 200 and responds with an array of comment objects with expected properties', () => {
@@ -138,8 +138,8 @@ describe('/api/articles/:article_id/comments', () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
-        const { Comments } = body;
-        Comments.forEach((comment) => {
+        const { commentData } = body;
+        commentData.forEach((comment) => {
           expect(comment).toMatchObject({
             comment_id: expect.any(Number),
             votes: expect.any(Number),
@@ -156,12 +156,60 @@ describe('/api/articles/:article_id/comments', () => {
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
-        const { Comments } = body;
-        const sortedComments = [...Comments].sort(
+        const { commentData } = body;
+        const sortedComments = [...commentData].sort(
           (a, b) => new Date(b.created_at) - new Date(a.created_at)
         );
-        expect(Comments).toEqual(sortedComments);
+        expect(commentData).toEqual(sortedComments);
       });
   });
-  
+});
+describe("POST /api/articles/:article_id/comments", () => {
+  test("POST: 201 should add a comment to the specified article", () => {
+    const newComment = {
+      username: "lurker",
+      body: "Testing comment 1",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        const { commentData } = body;
+        expect(commentData).toMatchObject({
+          comment_id: 19,
+          article_id: 1,
+          votes: 0,
+          author: "lurker",
+          body: "Testing comment 1",
+        });
+      });
+  });
+  test('POST: 400 if username is missing', () => {
+    const newComment = {
+      body: 'Testing comment 1'
+    };
+
+    return request(app)
+      .post('/api/articles/1/comments')
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body).toHaveProperty('msg', 'Username and body required.');
+      });
+  });
+  test('POST: 404 if the article does not exist', () => {
+    const newComment = {
+      username: 'lurker',
+      body: 'This is a Test Comment'
+    };
+
+    return request(app)
+      .post('/api/articles/9999/comments')
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body).toHaveProperty('msg', 'Not Found');
+      });
+  });
 });
