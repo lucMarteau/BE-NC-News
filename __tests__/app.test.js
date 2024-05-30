@@ -217,49 +217,67 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
-describe('PATCH /api/articles/:article_id', () => {
-  test('PATCH: 200 should update the article votes when given a number which will return an updated article', () => {
+describe("PATCH /api/articles/:article_id", () => {
+  test("PATCH: 200 should update the article votes when given a number which will return an updated article", () => {
     return request(app)
-    .patch("/api/articles/1")
-    .send ({ inc_votes:1 })
-    .expect(200)
-    .then(({ body }) => {
-      const { updatedArticle } = body;
-      expect(updatedArticle).toMatchObject({
-        article_id: 1,
-        votes: 101
-    })
-  })
-})
-test('PATCH: 200 should update the article votes when given a number which will return an updated article', () => {
-  return request(app)
-  .patch("/api/articles/1")
-  .send ({ inc_votes:-100 })
-  .expect(200)
-  .then(({ body }) => {
-    const { updatedArticle } = body;
-    expect(updatedArticle).toMatchObject({
-      article_id: 1,
-      votes: 0
-  })
-})
-})
-test('PATCH: 400 if inc_votes is not a number', () => {
-  return request(app)
-  .patch("/api/articles/1")
-  .send ({ inc_votes: 'string' })
-  .expect(400)
-  .then(({ body }) => {
-    expect(body.msg).toBe('Invalid input type');
-})
-})
-test('POST: 404 if the article does not exist', () => {
-  return request(app)
-    .patch('/api/articles/9999')
-    .send({ inc_votes: 1 })
-    .expect(404)
-    .then(({ body }) => {
-      expect(body.msg).toBe('Not Found');
-    });
+      .patch("/api/articles/1")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body }) => {
+        const { updatedArticle } = body;
+        expect(updatedArticle).toMatchObject({
+          article_id: 1,
+          votes: 101,
+        });
+      });
+  });
+  test("PATCH: 200 should update the article votes when given a number which will return an updated article", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -100 })
+      .expect(200)
+      .then(({ body }) => {
+        const { updatedArticle } = body;
+        expect(updatedArticle).toMatchObject({
+          article_id: 1,
+          votes: 0,
+        });
+      });
+  });
+  test("PATCH: 400 if inc_votes is not a number", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "string" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Invalid input type");
+      });
+  });
+  test("POST: 404 if the article does not exist", () => {
+    return request(app)
+      .patch("/api/articles/9999")
+      .send({ inc_votes: 1 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
 });
-})
+describe("DELETE /api/comments/:comment_id", () => {
+  test("DELETE: 204 should delete the given comment by comment_id", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({});
+      });
+  });
+  test("DELETE: 404 should delete the given comment by comment_id", () => {
+    return request(app)
+      .delete("/api/comments/9999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+});

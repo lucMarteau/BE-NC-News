@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes } = require("../models/topic.model");
+const { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes, updateDeletedComment } = require("../models/topic.model");
 const apiEndpoints = require("../endpoints.json");
 
 const getTopics = (req, res, next) => {
@@ -74,4 +74,15 @@ const patchUpdateVotes = (req, res, next) => {
     }
   });
 }
-module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments, postArticleComment, patchUpdateVotes };
+const deleteComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  updateDeletedComment(comment_id)
+  .then((commentData) => {
+    if (commentData === undefined){
+      return res.status(404).send({ msg: "Not Found" })
+    }
+    res.status(204).send(commentData);
+})
+.catch(next)
+}
+module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments, postArticleComment, patchUpdateVotes, deleteComment };
