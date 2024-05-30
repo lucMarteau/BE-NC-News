@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments } = require("../models/topic.model");
+const { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment } = require("../models/topic.model");
 const apiEndpoints = require("../endpoints.json");
 
 const getTopics = (req, res, next) => {
@@ -30,11 +30,30 @@ const getArticles = (req, res, next) => {
 const getArticleIdComments = (req, res, next) => {
   const { article_id } = req.params;
   fetchArticleComments(article_id)
-    .then((Comments) => {
-      res.status(200).send({ Comments });
+    .then((commentData) => {
+      res.status(200).send({ commentData });
     })
     .catch(next);
 }
+const postArticleComment = (req, res, next) => {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
 
+  if (!username || !body) {
+    return res.status(400).send({ msg: "Username and body required." });
+  }
 
-module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments };
+  addArticleComment(article_id, username, body)
+    .then((commentData) => {
+      res.status(201).send({ commentData });
+    })
+    .catch((err) => {
+      if (err.message === "Not Found") {
+        res.status(404).send({ msg: "Not Found" });
+      } else {
+        next(err);
+      }
+    });
+};
+
+module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments, postArticleComment };
