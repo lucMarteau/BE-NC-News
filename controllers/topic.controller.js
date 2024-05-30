@@ -78,7 +78,9 @@ const deleteComment = (req, res, next) => {
   const { comment_id } = req.params;
   updateDeletedComment(comment_id)
   .then((commentData) => {
-    console.log(commentData)
+    if (commentData === undefined){
+      return res.status(404).send({ msg: "Not Found" })
+    }
     res.status(204).send(commentData);
 })
 .catch(next)

@@ -272,5 +272,13 @@ describe('DELETE /api/comments/:comment_id', () => {
       expect(body).toEqual({})
     });
   });
+  test('DELETE: 404 should delete the given comment by comment_id', () => {
+    return request(app)
+    .delete("/api/comments/9999")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Not Found');
+    });
+  });
   
 });
