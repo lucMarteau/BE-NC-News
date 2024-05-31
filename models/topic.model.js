@@ -67,6 +67,8 @@ const updateArticleVotes = (article_id, inc_votes) => {
       if (rows.length === 0) {
         return Promise.reject(new Error("Not Found"));
       }
+      //return an object as error ({status:404, msg:"article not found"})
+      // reuse logic if already written as above
   return db.query(
     'UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;',
     [inc_votes, article_id]
@@ -82,4 +84,12 @@ const updateDeletedComment = (comment_id) => {
     return rows[0]
   })
 }
-module.exports = { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes, updateDeletedComment };
+// Handle errors in the model and refactor previous functions in the model
+
+const fetchUsers = () => {
+  return db.query(`SELECT * FROM users`)
+  .then(({ rows }) => {
+    return rows;
+  })
+};
+module.exports = { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes, updateDeletedComment, fetchUsers };

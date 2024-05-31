@@ -16,7 +16,9 @@ afterAll(() => {
 
 describe("/api/topics", () => {
   test("GET: 200 and get all topics from the endpoint", () => {
-    return request(app).get("/api/topics").expect(200);
+    return request(app)
+    .get("/api/topics")
+    .expect(200);
   });
   test("GET: 200 and responds with the correct length of the expected array", () => {
     return request(app)
@@ -221,7 +223,7 @@ describe("PATCH /api/articles/:article_id", () => {
   test("PATCH: 200 should update the article votes when given a number which will return an updated article", () => {
     return request(app)
       .patch("/api/articles/1")
-      .send({ inc_votes: 1 })
+      .send({ inc_votes: 1, extraProperty: "should be ignored" })
       .expect(200)
       .then(({ body }) => {
         const { updatedArticle } = body;
@@ -253,6 +255,7 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.msg).toBe("Invalid input type");
       });
   });
+  // above - required key missing i.e .send({newVote: 2})
   test("POST: 404 if the article does not exist", () => {
     return request(app)
       .patch("/api/articles/9999")
@@ -263,6 +266,8 @@ describe("PATCH /api/articles/:article_id", () => {
       });
   });
 });
+// POST needs a 400 error test for when sent an invalid id - i.e /api/articles/banana
+
 describe("DELETE /api/comments/:comment_id", () => {
   test("DELETE: 204 should delete the given comment by comment_id", () => {
     return request(app)
@@ -275,6 +280,34 @@ describe("DELETE /api/comments/:comment_id", () => {
   test("DELETE: 404 should delete the given comment by comment_id", () => {
     return request(app)
       .delete("/api/comments/9999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not Found");
+      });
+  });
+});
+// DELETE will need a 400 test for a comment which is invalid e.g. /api/comments/notanumber
+
+describe("GET: /api/users", () => {
+  test("GET: 200 should return an array containing the user object", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { userData } = body;
+        expect(userData.length).toBe(4);
+        userData.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        }); 
+      });
+  });
+  test("GET: 404 article should respond with Not found", () => {
+    return request(app)
+      .get("/api/usurpers")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Not Found");
