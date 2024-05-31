@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes, updateDeletedComment } = require("../models/topic.model");
+const { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes, updateDeletedComment, fetchUsers } = require("../models/topic.model");
 const apiEndpoints = require("../endpoints.json");
 
 const getTopics = (req, res, next) => {
@@ -74,6 +74,8 @@ const patchUpdateVotes = (req, res, next) => {
     }
   });
 }
+// error logic should be handled in the model to be handled by psql
+
 const deleteComment = (req, res, next) => {
   const { comment_id } = req.params;
   updateDeletedComment(comment_id)
@@ -85,4 +87,11 @@ const deleteComment = (req, res, next) => {
 })
 .catch(next)
 }
-module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments, postArticleComment, patchUpdateVotes, deleteComment };
+const getUsers = (req, res, next) => {
+  fetchUsers()
+    .then((userData) => {
+      res.status(200).send({ userData });
+    })
+    .catch(next);
+};
+module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments, postArticleComment, patchUpdateVotes, deleteComment, getUsers };
