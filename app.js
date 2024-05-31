@@ -9,7 +9,8 @@ const {
   postArticleComment,
   patchUpdateVotes,
   deleteComment,
-  getUsers
+  getUsers,
+  getArticlesQueries
 } = require("./controllers/topic.controller");
 
 app.use(express.json());
@@ -23,6 +24,7 @@ app.post("/api/articles/:article_id/comments", postArticleComment);
 app.patch("/api/articles/:article_id", patchUpdateVotes);
 app.delete("/api/comments/:comment_id", deleteComment);
 app.get("/api/users", getUsers);
+app.get("/api/articles", getArticlesQueries);
 
 app.use((err, req, res, next) => {
   if (err.status) {

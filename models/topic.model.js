@@ -92,4 +92,36 @@ const fetchUsers = () => {
     return rows;
   })
 };
-module.exports = { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes, updateDeletedComment, fetchUsers };
+const fetchArticlesWithTopic = (topic) => {
+  let query = `
+    SELECT 
+      articles.author, 
+      articles.title, 
+      articles.article_id, 
+      articles.topic, 
+      articles.created_at,
+      articles.votes,
+      articles.article_img_url,
+      COUNT(comment_id) AS comment_count
+    FROM articles 
+    LEFT JOIN comments ON comments.article_id = articles.article_id
+  `;
+
+  const queryParams = [];
+
+  if (topic) {
+    query += " WHERE articles.topic = $1";
+    queryParams.push(topic);
+  }
+
+  query += `
+    GROUP BY articles.article_id
+    ORDER BY articles.created_at DESC
+  `;
+
+  return db.query(query, queryParams)
+    .then(({ rows }) => {
+      return rows
+    });
+};
+module.exports = { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes, updateDeletedComment, fetchUsers, fetchArticlesWithTopic };

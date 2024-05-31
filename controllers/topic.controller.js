@@ -1,4 +1,4 @@
-const { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes, updateDeletedComment, fetchUsers } = require("../models/topic.model");
+const { fetchTopics, fetchArticleId, fetchArticles, fetchArticleComments, addArticleComment, updateArticleVotes, updateDeletedComment, fetchUsers, fetchArticlesWithTopic } = require("../models/topic.model");
 const apiEndpoints = require("../endpoints.json");
 
 const getTopics = (req, res, next) => {
@@ -94,4 +94,14 @@ const getUsers = (req, res, next) => {
     })
     .catch(next);
 };
-module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments, postArticleComment, patchUpdateVotes, deleteComment, getUsers };
+const getArticlesQueries = (req, res, next) => {
+  const { topic } = req.query;
+
+  
+  fetchArticlesWithTopic(topic)
+    .then((articleData) => {
+      res.status(200).send({ articleData });
+    })
+    .catch(next);
+};
+module.exports = { getTopics, getApi, getArticleId, getArticles, getArticleIdComments, postArticleComment, patchUpdateVotes, deleteComment, getUsers, getArticlesQueries };

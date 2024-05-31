@@ -314,3 +314,18 @@ describe("GET: /api/users", () => {
       });
   });
 });
+// describe('/api/articles?queries', () => {
+//   test.only("Get: 200 and should return articles filtered by the specified topic", () => {
+//     return request(app)
+//       .get("/api/articles?topic=cats")
+//       .expect(200)
+//       .then(({ body }) => {
+//         const { articleData } = body;
+//         console.log(body)
+//         articleData.forEach((article) => {
+//           console.log(article)
+//           expect(article.topic).toBe("cats");
+//         });
+//       });
+//   });
+// });
